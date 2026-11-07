@@ -26,25 +26,78 @@ for(let i=0;i<16;i++){let a=i/16*Math.PI*2,h=2+Math.random()*4;let p=new THREE.M
 function box(g,m,p,s,par){const o=new THREE.Mesh(g,m);o.position.set(...p);o.scale.set(...s);o.castShadow=true;o.receiveShadow=true;par.add(o);return o}
 function ball(m,p,s,par){return box(new THREE.SphereGeometry(1,20,16),m,p,s,par)}
 function capsule(m,p,r,h,par){const o=new THREE.Mesh(new THREE.CapsuleGeometry(r,h,6,12),m);o.position.set(...p);o.castShadow=true;par.add(o);return o}
-function makeVortex(x){const root=new THREE.Group();root.position.x=x;scene.add(root);const body=new THREE.Group();root.add(body);const steel=mat(0x303b4d,.9,.28),edge=mat(0x111a2a,.85,.25),blue=new THREE.MeshBasicMaterial({color:0x24dfff}),visor=new THREE.MeshBasicMaterial({color:0xff294f}),glow=new THREE.MeshBasicMaterial({color:0x16dfff,transparent:true,opacity:.16,side:THREE.DoubleSide});
-capsule(steel,[0,1.25,0],.4,.65,body);ball(steel,[0,1.95,0],[.39,.42,.34],body);box(new THREE.BoxGeometry(.55,.08,.06),visor,[0,1.99,.34],[1,1,1],body);
-for(let s of [-1,1]){ball(edge,[s*.43,1.53,0],[.28,.24,.3],body);capsule(steel,[s*.54,1.17,0],.15,.52,body);ball(edge,[s*.58,.85,.06],[.2,.19,.22],body);capsule(edge,[s*.22,.45,0],.18,.55,body);box(new THREE.BoxGeometry(.35,.16,.55),steel,[s*.22,.12,.1],[1,1,1],body)}
-// chest reactor and turbine rings
-ball(edge,[0,1.35,.34],[.29,.31,.12],body);const core=ball(blue,[0,1.36,.46],[.17,.17,.07],body);const turbine=new THREE.Mesh(new THREE.TorusGeometry(.28,.035,8,32),blue);turbine.position.set(0,1.36,.39);body.add(turbine);
-const cannon=box(new THREE.CylinderGeometry(.19,.25,.58,12),edge,[.58,1.02,.18],[1,1,1],body);cannon.rotation.z=Math.PI/2;const blade=box(new THREE.ConeGeometry(.13,.7,6),steel,[-.65,1.05,.15],[1,1,1],body);blade.rotation.z=-Math.PI/2;
-const cape=box(new THREE.BoxGeometry(.65,.95,.08),edge,[0,1.2,-.34],[1,1,1],body);cape.rotation.x=-.12;
-const aura=new THREE.Mesh(new THREE.CylinderGeometry(.5,.8,2.8,24,1,true),glow);aura.position.y=1.3;body.add(aura);
-return {name:'VORTEX',root,body,hp:100,energy:0,attack:0,stun:0,core,turbine,aura,speed:2.5,player:true};}
-function makeNero(x){const root=new THREE.Group();root.position.x=x;scene.add(root);const body=new THREE.Group();root.add(body);const skin=mat(0xd69b7d,.05,.7),black=mat(0x10131e,.35,.4),leather=mat(0x242a39,.55,.3),hair=mat(0x080b13,.1,.4),red=new THREE.MeshBasicMaterial({color:0xff3c4e}),fire=new THREE.MeshBasicMaterial({color:0xff681f});
-capsule(leather,[0,1.25,0],.35,.65,body);ball(skin,[0,1.98,0],[.32,.39,.3],body);ball(hair,[0,2.23,-.02],[.38,.24,.36],body);
-for(let i=0;i<6;i++){const sp=new THREE.Mesh(new THREE.ConeGeometry(.12,.48,6),hair);sp.position.set((i-2.5)*.12,2.45,(i%2)*.08);sp.rotation.z=(i-2.5)*-.2;body.add(sp)}
-box(new THREE.BoxGeometry(.13,.045,.04),red,[-.14,2.02,.29],[1,1,1],body);
-for(let s of [-1,1]){capsule(s===1?fire:skin,[s*.48,1.22,.02],.12,.5,body);ball(s===1?fire:black,[s*.53,.91,.1],[.17,.17,.18],body);capsule(black,[s*.2,.46,0],.16,.58,body);box(new THREE.BoxGeometry(.35,.15,.5),black,[s*.2,.12,.12],[1,1,1],body)}
-// torn jacket tails and glowing gauntlet
-for(let s of [-1,1]){const tail=box(new THREE.BoxGeometry(.2,.72,.08),leather,[s*.28,.8,-.27],[1,1,1],body);tail.rotation.z=s*.12}
-const glove=ball(fire,[.55,.93,.12],[.22,.24,.2],body);const flame=ball(new THREE.MeshBasicMaterial({color:0xffa52b,transparent:true,opacity:.75}),[.62,1.12,.1],[.13,.28,.13],body);
-const aura=new THREE.Mesh(new THREE.CylinderGeometry(.45,.7,2.7,24,1,true),new THREE.MeshBasicMaterial({color:0xff315e,transparent:true,opacity:.12,side:THREE.DoubleSide}));aura.position.y=1.3;body.add(aura);
-return {name:'NERO',root,body,hp:100,energy:0,attack:0,stun:0,glove,flame,aura,speed:4.3,player:false};}
+function makeVortex(x){
+ const root=new THREE.Group();root.position.x=x;scene.add(root);const body=new THREE.Group();root.add(body);
+ const steel=mat(0x343d4d,.92,.24),dark=mat(0x101722,.86,.28),edge=mat(0x667487,.9,.22),blue=new THREE.MeshBasicMaterial({color:0x20dfff}),blueDim=mat(0x087a9d,.75,.22,.7),red=new THREE.MeshBasicMaterial({color:0xff234d});
+ // armored torso, layered chest and waist
+ capsule(dark,[0,1.28,0],.43,.62,body);box(new THREE.BoxGeometry(.78,.72,.34),steel,[0,1.34,.05],[1,1,1],body);
+ for(let s of [-1,1]){const p=box(new THREE.BoxGeometry(.31,.48,.12),edge,[s*.22,1.42,.25],[1,1,1],body);p.rotation.z=s*-.12;box(new THREE.BoxGeometry(.22,.09,.1),dark,[s*.22,1.12,.25],[1,1,1],body)}
+ box(new THREE.BoxGeometry(.56,.16,.36),dark,[0,.91,0],[1,1,1],body);
+ // head, angular helmet, red V visor
+ ball(dark,[0,2.02,0],[.36,.39,.34],body);box(new THREE.BoxGeometry(.62,.22,.58),steel,[0,2.12,-.01],[1,1,1],body);
+ box(new THREE.BoxGeometry(.48,.07,.045),red,[0,2.04,.325],[1,1,1],body);
+ for(let s of [-1,1]){const v=box(new THREE.BoxGeometry(.055,.19,.045),red,[s*.12,1.99,.33],[1,1,1],body);v.rotation.z=s*.55}
+ box(new THREE.BoxGeometry(.16,.08,.42),dark,[0,1.79,0],[1,1,1],body);
+ // turbine reactor with concentric rings and radial fins
+ ball(dark,[0,1.38,.29],[.3,.3,.12],body);const core=ball(blue,[0,1.38,.42],[.17,.17,.07],body);
+ const turbine=new THREE.Group();turbine.position.set(0,1.38,.39);body.add(turbine);
+ for(let r of [.23,.31]){const tor=new THREE.Mesh(new THREE.TorusGeometry(r,.025,8,36),blue);turbine.add(tor)}
+ for(let i=0;i<8;i++){const fin=box(new THREE.BoxGeometry(.035,.18,.035),blue,[0,.0,.02],[1,1,1],turbine);fin.rotation.z=i*Math.PI/4;fin.position.set(Math.cos(i*Math.PI/4)*.14,Math.sin(i*Math.PI/4)*.14,.02)}
+ // broad mechanical shoulders and segmented arms
+ for(let s of [-1,1]){
+  const shoulder=ball(steel,[s*.53,1.62,0],[.31,.3,.34],body);shoulder.rotation.z=s*.2;
+  box(new THREE.BoxGeometry(.3,.18,.34),edge,[s*.55,1.78,.02],[1,1,1],body);
+  const upper=capsule(steel,[s*.62,1.3,0],.17,.36,body);upper.rotation.z=s*-.12;
+  ball(dark,[s*.67,1.03,.02],[.2,.2,.22],body);
+  const fore=capsule(dark,[s*.68,.82,.03],.16,.27,body);fore.rotation.z=s*.08;
+  for(let j=0;j<3;j++)box(new THREE.BoxGeometry(.12,.035,.19),edge,[s*.68,.82+j*.09,.16],[1,1,1],body);
+ }
+ // right arm cannon, left forearm blade
+ const cannon=new THREE.Group();cannon.position.set(.72,.91,.13);body.add(cannon);
+ const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.2,.27,.64,12),steel);barrel.rotation.x=Math.PI/2;barrel.position.z=.24;cannon.add(barrel);
+ const muzzle=new THREE.Mesh(new THREE.TorusGeometry(.18,.045,8,20),blue);muzzle.position.z=.57;cannon.add(muzzle);
+ const inner=new THREE.Mesh(new THREE.CircleGeometry(.13,20),blue);inner.position.z=.575;cannon.add(inner);
+ const blade=new THREE.Mesh(new THREE.ConeGeometry(.14,.86,6),edge);blade.rotation.x=Math.PI/2;blade.position.set(-.73,.91,.48);body.add(blade);
+ // armored thighs, knees, shins, magnetic boots
+ for(let s of [-1,1]){capsule(steel,[s*.23,.57,0],.18,.42,body);ball(edge,[s*.23,.32,.05],[.21,.17,.23],body);capsule(dark,[s*.23,.14,.02],.16,.16,body);box(new THREE.BoxGeometry(.38,.16,.56),steel,[s*.23,.06,.13],[1,1,1],body);box(new THREE.BoxGeometry(.26,.035,.08),blue,[s*.23,.15,.31],[1,1,1],body)}
+ // torn segmented metal cape
+ const cape=box(new THREE.BoxGeometry(.72,.88,.1),dark,[0,1.27,-.34],[1,1,1],body);cape.rotation.x=-.08;
+ for(let i=0;i<5;i++){const shard=box(new THREE.BoxGeometry(.12,.34+Math.random()*.18,.08),steel,[-.3+i*.15,.73,-.35],[1,1,1],body);shard.rotation.z=(i-2)*.12}
+ const aura=new THREE.Mesh(new THREE.CylinderGeometry(.58,.85,2.8,24,1,true),new THREE.MeshBasicMaterial({color:0x16dfff,transparent:true,opacity:.1,side:THREE.DoubleSide}));aura.position.y=1.25;body.add(aura);
+ return {name:'VORTEX',root,body,hp:100,energy:0,attack:0,stun:0,core,turbine,aura,speed:2.5,player:true};
+}
+function makeNero(x){
+ const root=new THREE.Group();root.position.x=x;scene.add(root);const body=new THREE.Group();root.add(body);
+ const skin=mat(0xc98c70,.04,.72),black=mat(0x11141c,.22,.5),leather=mat(0x252a34,.62,.32),seam=mat(0x626b7b,.55,.4),hair=mat(0x080a10,.12,.3),white=mat(0xd9e1e8,.25,.28),red=new THREE.MeshBasicMaterial({color:0xff304f}),fire=new THREE.MeshBasicMaterial({color:0xff5a18});
+ // fitted black cargo silhouette and boots
+ capsule(black,[0,1.25,0],.35,.62,body);box(new THREE.BoxGeometry(.67,.16,.35),leather,[0,1.56,.02],[1,1,1],body);
+ for(let s of [-1,1]){capsule(black,[s*.2,.55,0],.15,.52,body);box(new THREE.BoxGeometry(.29,.24,.25),leather,[s*.2,.63,.12],[1,1,1],body);box(new THREE.BoxGeometry(.31,.13,.48),black,[s*.2,.08,.13],[1,1,1],body);box(new THREE.BoxGeometry(.22,.18,.09),leather,[s*.29,.55,.2],[1,1,1],body);box(new THREE.BoxGeometry(.08,.07,.025),seam,[s*.29,.55,.25],[1,1,1],body)}
+ // jacket open at center, asymmetric lapels, straps and torn tails
+ for(let s of [-1,1]){const panel=box(new THREE.BoxGeometry(.29,.68,.15),leather,[s*.2,1.36,.22],[1,1,1],body);panel.rotation.z=s*.08;const lapel=box(new THREE.BoxGeometry(.16,.42,.07),seam,[s*.13,1.56,.32],[1,1,1],body);lapel.rotation.z=s*.35;box(new THREE.BoxGeometry(.18,.16,.07),black,[s*.22,1.08,.31],[1,1,1],body);const tail=box(new THREE.BoxGeometry(.2,.4,.08),leather,[s*.29,.82,-.16],[1,1,1],body);tail.rotation.z=s*.15}
+ box(new THREE.BoxGeometry(.055,.48,.035),seam,[0,1.3,.31],[1,1,1],body);
+ // shoulder straps, buckles, NERO name plate
+ for(let s of [-1,1]){const strap=box(new THREE.BoxGeometry(.06,.68,.04),black,[s*.25,1.4,.31],[1,1,1],body);strap.rotation.z=s*.23;box(new THREE.BoxGeometry(.12,.07,.04),seam,[s*.25,1.27,.34],[1,1,1],body)}
+ box(new THREE.BoxGeometry(.34,.09,.035),black,[0,1.63,.3],[1,1,1],body);
+ // neck and face with scar and red cybernetic eye
+ capsule(skin,[0,1.82,.02],.13,.12,body);ball(skin,[0,2.08,.02],[.3,.37,.28],body);
+ box(new THREE.BoxGeometry(.1,.025,.025),black,[.12,2.17,.27],[1,1,1],body);
+ box(new THREE.BoxGeometry(.075,.13,.035),red,[-.12,2.13,.27],[1,1,1],body);
+ const scar=box(new THREE.BoxGeometry(.025,.24,.025),new THREE.MeshBasicMaterial({color:0x8b333b}),[.19,2.08,.28],[1,1,1],body);scar.rotation.z=-.35;
+ // messy black hair cap and separated spikes; white streak
+ ball(hair,[0,2.32,-.015],[.34,.2,.31],body);
+ for(let i=0;i<9;i++){const a=(i/8)*Math.PI*1.5-.75;const spike=new THREE.Mesh(new THREE.ConeGeometry(.095,.38+(i%3)*.07,6),hair);spike.position.set(Math.sin(a)*.25,2.48+(i%2)*.04,Math.cos(a)*.19);spike.rotation.z=Math.sin(a)*.55;spike.rotation.x=-.2;body.add(spike)}
+ const streak=new THREE.Mesh(new THREE.ConeGeometry(.055,.34,5),white);streak.position.set(.08,2.51,.2);streak.rotation.z=-.25;body.add(streak);
+ // arms, mechanical fire gauntlet on right arm
+ for(let s of [-1,1]){ball(skin,[s*.43,1.52,0],[.19,.2,.2],body);const arm=capsule(s===1?black:skin,[s*.49,1.24,.04],.105,.43,body);arm.rotation.z=s*.1}
+ const glove=new THREE.Group();glove.position.set(.52,.91,.12);body.add(glove);
+ const cuff=box(new THREE.BoxGeometry(.25,.28,.27),black,[0,0,0],[1,1,1],glove);
+ for(let i=0;i<4;i++){const plate=box(new THREE.BoxGeometry(.06,.22,.29),i%2?seam:fire,[-.09+i*.06,.02,.02],[1,1,1],glove);plate.rotation.z=(i-1.5)*.08}
+ ball(fire,[0,-.16,.12],[.16,.18,.16],glove);
+ const flame=new THREE.Group();flame.position.set(0,.18,.08);glove.add(flame);
+ for(let i=0;i<5;i++){const tongue=new THREE.Mesh(new THREE.ConeGeometry(.07,.34+(i%2)*.16,7),new THREE.MeshBasicMaterial({color:i%2?0xffc13b:0xff4a16,transparent:true,opacity:.86}));tongue.position.set((i-2)*.075,.22+Math.random()*.08,0);tongue.rotation.z=(i-2)*-.22;flame.add(tongue)}
+ const aura=new THREE.Mesh(new THREE.CylinderGeometry(.48,.72,2.7,24,1,true),new THREE.MeshBasicMaterial({color:0xff315e,transparent:true,opacity:.07,side:THREE.DoubleSide}));aura.position.y=1.3;body.add(aura);
+ return {name:'NERO',root,body,hp:100,energy:0,attack:0,stun:0,glove,flame,aura,speed:4.3,player:false};
+}
 const vortex=makeVortex(-2.4),nero=makeNero(2.4);let running=false,paused=false,round=1,time=99,shake=0,clock=0;const keys={};const particles=[];
 function hud(){document.querySelector('#hp1').style.width=vortex.hp+'%';document.querySelector('#hp2').style.width=nero.hp+'%';document.querySelector('#energyfill').style.width=vortex.energy+'%'}
 function say(t){const el=document.querySelector('#msg');el.textContent=t;el.classList.add('on');clearTimeout(say.timer);say.timer=setTimeout(()=>el.classList.remove('on'),850)}
