@@ -1,1 +1,39 @@
-PLACEHOLDER
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Anime Clash</title>
+<style>
+*{box-sizing:border-box;touch-action:manipulation}body{margin:0;background:#080d1d;color:#fff;font-family:system-ui,sans-serif;overflow:hidden}canvas{display:block}#hud{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:12px;pointer-events:none}.fighter{width:40%;font-weight:900;text-shadow:0 2px 5px #000}.bar{height:14px;border:2px solid white;background:#252b40;border-radius:9px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#00d9ff,#7cf5ff);width:100%}#enemy{background:linear-gradient(90deg,#ff315d,#ff9b55)}#timer{font-size:26px;font-weight:1000;text-align:center}#controls{position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:space-between;padding:0 18px;align-items:end}.group{display:flex;gap:9px;align-items:center}button{width:58px;height:58px;border-radius:50%;border:1px solid #ffffff88;background:#192b50dd;color:white;font-size:19px;font-weight:900;box-shadow:0 4px 14px #0008}button.hit{background:#b52e51}button.special{background:#713bc9}button:active{transform:scale(.93)}#overlay{position:fixed;inset:0;background:#050817dd;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}#panel{max-width:420px;background:#101a30;border:1px solid #6deaff66;border-radius:20px;padding:26px}h1{font-size:42px;margin:0;background:linear-gradient(90deg,#fff,#62eaff);color:transparent;background-clip:text}p{color:#d8e5fa;line-height:1.5}#start{border:0;border-radius:12px;background:linear-gradient(90deg,#06b9db,#7657ff);color:white;font-size:17px;font-weight:900;padding:14px 26px}#message{position:fixed;top:35%;left:0;right:0;text-align:center;font-size:34px;font-weight:1000;text-shadow:0 4px 15px #000;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="hud"><div class="fighter">KAI<div class="bar"><div id="hp" class="fill"></div></div></div><div id="timer">99</div><div class="fighter" style="text-align:right">RAIDEN<div class="bar"><div id="enemy" class="fill"></div></div></div></div>
+<div id="message"></div>
+<div id="controls"><div class="group"><button data-key="left">◀</button><button data-key="right">▶</button><button data-key="jump">↑</button></div><div class="group"><button data-key="guard">🛡</button><button class="hit" data-key="attack">ATQ</button><button class="special" data-key="special">✦</button></div></div>
+<div id="overlay"><div id="panel"><h1>ANIME CLASH</h1><p><b>KAI vs. RAIDEN</b><br>Entre na arena, ataque, defenda e use seu golpe especial!</p><p>Protótipo 3D experimental para navegador Android. Use os botões na tela ou teclado.</p><button id="start">COMEÇAR LUTA</button></div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x080d20);scene.fog=new THREE.Fog(0x080d20,15,34);
+const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,100);camera.position.set(0,5.5,13.8);camera.lookAt(0,1.2,0);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0x9ecaff,0x171027,2));const light=new THREE.DirectionalLight(0xffffff,2.4);light.position.set(-4,9,7);light.castShadow=true;scene.add(light);
+const floor=new THREE.Mesh(new THREE.CylinderGeometry(8,8,.35,64),new THREE.MeshStandardMaterial({color:0x202b4b,metalness:.25,roughness:.65}));floor.position.y=-.2;floor.receiveShadow=true;scene.add(floor);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(7.25,.055,8,100),new THREE.MeshBasicMaterial({color:0x38dfff}));ring.rotation.x=Math.PI/2;ring.position.y=-.015;scene.add(ring);
+function fighter(x,c){const root=new THREE.Group();root.position.x=x;scene.add(root);const skin=new THREE.MeshStandardMaterial({color:c.skin}),cloth=new THREE.MeshStandardMaterial({color:c.cloth}),hair=new THREE.MeshStandardMaterial({color:c.hair}),glow=new THREE.MeshBasicMaterial({color:c.aura,transparent:true,opacity:.15,side:THREE.BackSide});
+function part(g,mat,pos,scale){const m=new THREE.Mesh(g,mat);m.position.set(...pos);m.scale.set(...scale);m.castShadow=true;root.add(m);return m}
+part(new THREE.CapsuleGeometry(.42,.8,5,10),cloth,[0,1.15,0],[1,1,1]);part(new THREE.SphereGeometry(.34,16,12),skin,[0,2.05,0],[.9,1.1,.85]);part(new THREE.SphereGeometry(.36,12,10),hair,[0,2.29,-.04],[1.05,.55,1]);part(new THREE.BoxGeometry(.17,.7,.2),cloth,[-.55,1.35,0],[1,1,1]);part(new THREE.BoxGeometry(.17,.7,.2),cloth,[.55,1.35,0],[1,1,1]);part(new THREE.BoxGeometry(.25,.8,.27),cloth,[-.23,.42,0],[1,1,1]);part(new THREE.BoxGeometry(.25,.8,.27),cloth,[.23,.42,0],[1,1,1]);const aura=new THREE.Mesh(new THREE.SphereGeometry(1.2,16,12),glow);aura.position.y=1.35;root.add(aura);return {root,hp:100,aura,guard:false};}
+const kai=fighter(-2.3,{skin:0xffc49d,cloth:0x142c55,hair:0x10172b,aura:0x19cfff}),raiden=fighter(2.3,{skin:0xe8b99c,cloth:0x4c1830,hair:0xd8e2ef,aura:0xff285c});
+let running=false,time=99,energy=0;const keys={};const $=s=>document.querySelector(s);
+function hud(){$('#hp').style.width=kai.hp+'%';$('#enemy').style.width=raiden.hp+'%';$('#timer').textContent=Math.ceil(time)}
+function attack(){if(!running)return;if(Math.abs(kai.root.position.x-raiden.root.position.x)<2.3){raiden.hp=Math.max(0,raiden.hp-(keys.special?24:9));energy=Math.min(100,energy+18);$('#message').textContent='COMBO!';setTimeout(()=>$('#message').textContent='',500);if(raiden.hp===0)end('KAI');}hud()}
+function special(){if(energy<55||!running)return;energy-=55;raiden.hp=Math.max(0,raiden.hp-28);$('#message').textContent='GOLPE ESPECIAL!';setTimeout(()=>$('#message').textContent='',700);if(raiden.hp===0)end('KAI');hud()}
+document.querySelectorAll('[data-key]').forEach(b=>{let k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;if(k==='attack')attack();if(k==='special')special();});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>keys[k]=false)});
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key===' '||e.key==='j')attack();if(e.key==='k')special()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+function end(w){running=false;$('#message').textContent=w+' VENCEU!';$('#start').textContent='JOGAR NOVAMENTE';$('#overlay').style.display='flex'}
+$('#start').onclick=()=>{kai.hp=raiden.hp=100;time=99;energy=0;kai.root.position.x=-2.3;raiden.root.position.x=2.3;running=true;$('#overlay').style.display='none';$('#message').textContent='LUTEM!';hud()};
+let last=0;function animate(t){requestAnimationFrame(animate);const dt=Math.min((t-last)/1000||0,.04);last=t;if(running){time=Math.max(0,time-dt);if(time===0)end(kai.hp>=raiden.hp?'KAI':'RAIDEN');let move=(keys.right?1:0)-(keys.left?1:0);kai.root.position.x=THREE.MathUtils.clamp(kai.root.position.x+move*dt*4.2,-6,6);kai.guard=!!keys.guard;let d=kai.root.position.x-raiden.root.position.x;if(Math.abs(d)>1.7)raiden.root.position.x+=Math.sign(d)*dt*1.2;else if(Math.random()<.025)kai.hp=Math.max(0,kai.hp-(kai.guard?1:5));if(kai.hp===0)end('RAIDEN');kai.root.position.y=keys.jump?Math.abs(Math.sin(t*.009))*1.1:0;raiden.root.position.y=0;kai.aura.material.opacity=.12+energy/500;hud()}renderer.render(scene,camera)}
+animate(0);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body></html>
